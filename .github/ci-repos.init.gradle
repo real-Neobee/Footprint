@@ -1,0 +1,10 @@
+// CI 专用：GitHub 云端访问阿里云镜像不稳定(502)，这里强制改用官方仓库。
+// 仅在本仓库的 GitHub Actions 中通过 --init-script 使用，不影响本地构建。
+settingsEvaluated { settings ->
+    settings.dependencyResolutionManagement.repositories {
+        clear()
+        google()
+        mavenCentral()
+        maven { url = uri('https://storage.googleapis.com/download.flutter.io') }
+    }
+}

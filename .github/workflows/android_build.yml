@@ -101,7 +101,7 @@ jobs:
           ./gradlew --version
 
       - name: 构建 APK（Debug + Release）
-        run: ./gradlew --no-daemon assembleDebug assembleRelease
+        run: ./gradlew --no-daemon --init-script .github/ci-repos.init.gradle assembleDebug assembleRelease
 
       - name: 上传 Debug APK（可直接安装试用）
         uses: actions/upload-artifact@v4
