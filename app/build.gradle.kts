@@ -19,6 +19,17 @@ android {
         }
     }
 
+    // ===== 发布签名（可选）=====
+    // 若项目根目录存在 keystore.properties（配合你的 .jks 签名文件），Release 构建将自动签名；
+    // 不存在时不影响构建：Release 输出“未签名包”，Debug 始终可安装。
+    // 模板见 keystore.properties.example，详细说明见 BUILD_APK_GUIDE.md
+    val keystoreProperties = Properties()
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val hasKeystore = keystorePropertiesFile.exists()
+    if (hasKeystore) {
+        keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+    }
+
     defaultConfig {
         applicationId = "com.footprint"
         minSdk = 24
@@ -42,9 +53,24 @@ android {
         resourceConfigurations += listOf("zh", "zh-rCN", "en")
     }
 
+    signingConfigs {
+        if (hasKeystore) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false  // 禁用混淆，保证 Release 版本功能与 Debug 完全一致
+            // 存在 keystore.properties 时使用 release 签名，否则生成未签名包
+            if (hasKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isShrinkResources = false // 禁用资源缩减，防止误删图片处理相关资源
             // 关键：确保子项目（如 Flutter 模块）也使用 Release 模式
             proguardFiles(
