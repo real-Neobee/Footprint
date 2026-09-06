@@ -86,6 +86,9 @@ jobs:
             echo "需要正式签名包请先运行“生成 Release 签名文件”工作流并配置 Secrets，详见 BUILD_APK_GUIDE.md"
           fi
 
+      - name: 赋予 gradlew 执行权限（Windows 提交时 Git 会丢失执行位）
+        run: chmod +x gradlew
+
       - name: 构建 APK（Debug + Release）
         run: ./gradlew --no-daemon assembleDebug assembleRelease
 
