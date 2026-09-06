@@ -89,6 +89,17 @@ jobs:
       - name: 赋予 gradlew 执行权限（Windows 提交时 Git 会丢失执行位）
         run: chmod +x gradlew
 
+      - name: 统一 Gradle wrapper 为 8.14（官方源）并打印诊断
+        run: |
+          echo '===== 仓库内所有 gradle-wrapper.properties（统一改为 8.14）====='
+          find . -path ./.git -prune -o -name gradle-wrapper.properties -print | while read -r f; do
+            echo "---- $f ----"
+            printf 'distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-8.14-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n' > "$f"
+            cat "$f"
+          done
+          echo '===== ./gradlew --version ====='
+          ./gradlew --version
+
       - name: 构建 APK（Debug + Release）
         run: ./gradlew --no-daemon assembleDebug assembleRelease
 
